@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://brvqytarftsogyxdbicb.supabase.co; manifest-src 'self'; worker-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0e0e10">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Contagem">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.png">
+  <link rel="apple-touch-icon" href="icone.png">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="contagem.css">
+  <title>Contagem · Etiquetas de Validade</title>
+  <script type="module" src="contagem.js"></script>
+</head>
+<body class="pagina-contagem">
+  <header class="topo" id="topo" hidden>
+    <img class="topo-logo" src="logo-impettus.png" alt="Grupo Impettus">
+    <div class="topo-textos">
+      <strong>Contagem</strong>
+      <small id="topo-sub"></small>
+    </div>
+    <a class="botao-link" id="link-painel" href="./">Painel</a>
+    <button class="botao-sair" id="btn-sair" type="button">Sair</button>
+  </header>
+
+  <div class="faixa-aviso" id="aviso" role="alert" hidden></div>
+
+  <!-- Entrada (mesma sessão do Painel de Gestão) -->
+  <section class="tela-login" id="tela-login" hidden>
+    <form class="cartao-login" id="form-login" novalidate>
+      <img class="login-logo" src="logo-impettus.png" alt="Grupo Impettus">
+      <h1>Contagem</h1>
+      <p>Bipe com a câmera as etiquetas da loja. As unidades que não forem bipadas recebem baixa como utilizadas.</p>
+      <label class="rotulo" for="login-email">E-mail</label>
+      <input class="campo" id="login-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
+      <label class="rotulo" for="login-senha">Senha</label>
+      <input class="campo" id="login-senha" type="password" autocomplete="current-password">
+      <label class="marcar"><input type="checkbox" id="login-manter" checked> Manter conectado neste aparelho</label>
+      <button class="botao-principal" id="btn-entrar" type="submit">Entrar</button>
+      <p class="login-erro" id="login-erro" role="alert" hidden></p>
+      <p class="nota">🔒 Use o mesmo acesso do app. Precisa de internet para começar e para gravar.</p>
+    </form>
+  </section>
+
+  <!-- Primeiro acesso ainda não feito -->
+  <section class="tela-login" id="tela-primeiro" hidden>
+    <div class="cartao-login">
+      <img class="login-logo" src="logo-impettus.png" alt="Grupo Impettus">
+      <h1>Falta o primeiro acesso</h1>
+      <p>Antes de contar, entre uma vez no app <strong>Etiquetas de Validade</strong> no computador para aceitar os termos de uso e criar a sua senha.</p>
+      <button class="botao-principal" id="btn-primeiro-sair" type="button">Voltar</button>
+    </div>
+  </section>
+
+  <!-- Escolha da loja e do que contar -->
+  <main class="cont" id="tela-escolha" hidden>
+    <h1 class="cont-titulo">Nova contagem</h1>
+    <p class="cont-ajuda">Bipe as etiquetas que estão na loja. No fim, as unidades que <strong>não</strong> forem bipadas recebem baixa como <strong>utilizadas</strong>, para não avisarem vencimento de produto que já foi usado.</p>
+    <label class="rotulo" for="escolha-loja">Loja</label>
+    <select class="campo" id="escolha-loja"></select>
+    <p class="cont-status" id="escolha-status" role="status"></p>
+    <div class="bloco" id="bloco-escopo" hidden>
+      <div class="bloco-topo">
+        <h2>O que contar</h2>
+        <input class="campo campo-pequeno" id="escolha-busca" type="search" placeholder="Buscar produto" aria-label="Buscar produto" hidden>
+      </div>
+      <div class="opcoes" id="escolha-opcoes" role="radiogroup" aria-label="O que contar"></div>
+      <p class="nota-cont" id="escolha-legado" hidden></p>
+    </div>
+    <div class="barra-final">
+      <button class="botao-principal" id="btn-iniciar" type="button" disabled>Iniciar contagem</button>
+    </div>
+  </main>
+
+  <!-- Contagem em andamento -->
+  <main class="cont" id="tela-contagem" hidden>
+    <div class="cont-cabeca">
+      <div class="cont-cabeca-textos">
+        <strong id="cont-escopo"></strong>
+        <small id="cont-loja"></small>
+      </div>
+      <div class="cont-progresso" id="cont-progresso" aria-live="polite"></div>
+    </div>
+    <div class="barra-progresso"><span id="cont-barra"></span></div>
+
+    <div class="camera" id="camera">
+      <video id="video" playsinline muted autoplay disablepictureinpicture></video>
+      <div class="mira" id="mira" aria-hidden="true"></div>
+      <p class="camera-estado" id="camera-estado">Câmera desligada</p>
+      <div class="camera-botoes">
+        <button class="botao-camera" id="btn-lanterna" type="button" hidden>🔦 Lanterna</button>
+        <button class="botao-camera" id="btn-camera" type="button">📷 Ligar câmera</button>
+      </div>
+    </div>
+
+    <div class="ultimo" id="ultimo" role="status" aria-live="assertive" hidden></div>
+
+    <form class="manual" id="form-manual" novalidate>
+      <input class="campo" id="manual-codigo" type="text" placeholder="Digitar código (ex.: 1070-3)" aria-label="Digitar código da etiqueta" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+      <button class="botao-secundario" id="btn-manual" type="submit">OK</button>
+    </form>
+
+    <section class="bloco" id="bloco-baixadas" hidden>
+      <h2>Estavam com baixa</h2>
+      <div class="lista" id="lista-baixadas"></div>
+    </section>
+
+    <section class="bloco">
+      <div class="bloco-topo">
+        <h2>Unidades</h2>
+        <div class="chips" id="cont-filtros">
+          <button type="button" class="chip ativo" data-filtro="">Todas</button>
+          <button type="button" class="chip" data-filtro="faltam">Faltam</button>
+          <button type="button" class="chip" data-filtro="achadas">Bipadas</button>
+        </div>
+      </div>
+      <div class="lista" id="grupos"></div>
+    </section>
+
+    <section class="bloco" id="bloco-avisos" hidden>
+      <h2>Avisos</h2>
+      <ul class="avisos" id="avisos"></ul>
+    </section>
+
+    <div class="barra-final">
+      <button class="botao-secundario" id="btn-cancelar" type="button">Cancelar</button>
+      <button class="botao-principal" id="btn-finalizar" type="button">Finalizar contagem</button>
+    </div>
+  </main>
+
+  <!-- Conferência antes de gravar -->
+  <main class="cont" id="tela-resumo" hidden>
+    <h1 class="cont-titulo">Conferir antes de gravar</h1>
+    <p class="cont-ajuda" id="resumo-escopo"></p>
+    <p class="alerta-cont" id="resumo-travada" role="alert" hidden></p>
+    <div class="numeros" id="resumo-numeros"></div>
+    <p class="alerta-cont" id="resumo-alerta" role="alert" hidden></p>
+    <p class="alerta-cont" id="resumo-pessoa" hidden></p>
+    <div id="resumo-listas"></div>
+    <p class="nota-cont" id="resumo-nota"></p>
+    <p class="login-erro" id="resumo-erro" role="alert" hidden></p>
+    <div class="barra-final">
+      <button class="botao-secundario" id="btn-voltar-contagem" type="button">Voltar</button>
+      <button class="botao-secundario" id="btn-cancelar-resumo" type="button" hidden>Cancelar contagem</button>
+      <button class="botao-principal" id="btn-confirmar" type="button">Confirmar</button>
+    </div>
+  </main>
+
+  <!-- Resultado -->
+  <main class="cont" id="tela-resultado" hidden>
+    <h1 class="cont-titulo" id="resultado-titulo">Contagem gravada</h1>
+    <p class="cont-ajuda" id="resultado-escopo"></p>
+    <div class="numeros" id="resultado-numeros"></div>
+    <div id="resultado-reimprimir"></div>
+    <p class="login-erro" id="resultado-erro" role="alert" hidden></p>
+    <div class="acoes-resultado">
+      <a class="botao-secundario botao-bloco" id="link-voltar-celular" href="./" hidden>Voltar ao celular da loja</a>
+      <button class="botao-secundario botao-bloco" id="btn-desfazer" type="button">Desfazer contagem</button>
+      <button class="botao-principal" id="btn-nova" type="button">Nova contagem</button>
+    </div>
+  </main>
+
+  <!-- Confirmações -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <h2 id="modal-titulo"></h2>
+      <p id="modal-texto"></p>
+      <div class="modal-botoes">
+        <button class="botao-secundario" id="modal-nao" type="button">Voltar</button>
+        <button class="botao-principal" id="modal-sim" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="rodape" id="rodape">
+    <span>🔒 As baixas da contagem ficam no seu nome e podem ser desfeitas logo depois.</span>
+    <span id="copyright"></span>
+  </footer>
+</body>
+</html>

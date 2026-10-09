@@ -1,0 +1,17 @@
+{
+  "name": "Painel de Gestão · Etiquetas de Validade",
+  "short_name": "Gestão Etiquetas",
+  "description": "Etiquetas vencidas, a vencer e no prazo de cada loja, e contagem das etiquetas por QR code.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e0e10",
+  "theme_color": "#0e0e10",
+  "shortcuts": [
+    { "name": "Contagem", "short_name": "Contagem", "description": "Bipar as etiquetas da loja com a câmera", "url": "contagem.html" }
+  ],
+  "icons": [
+    { "src": "icone.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

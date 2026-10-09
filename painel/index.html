@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://brvqytarftsogyxdbicb.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0e0e10">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gestão">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.png">
+  <link rel="apple-touch-icon" href="icone.png">
+  <link rel="stylesheet" href="app.css">
+  <title>Painel de Gestão · Etiquetas de Validade</title>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="topo" id="topo" hidden>
+    <img class="topo-logo" src="logo-impettus.png" alt="Grupo Impettus">
+    <div class="topo-textos">
+      <strong>Painel de Gestão</strong>
+      <small id="topo-sub"></small>
+    </div>
+    <a class="botao-link destaque" id="link-contagem" href="contagem.html" title="Contar as etiquetas da loja com a câmera">Contagem</a>
+    <button class="botao-icone" id="btn-atualizar" type="button" title="Atualizar" aria-label="Atualizar">⟳</button>
+    <button class="botao-sair" id="btn-sair" type="button">Sair</button>
+  </header>
+
+  <div class="faixa-aviso" id="aviso" role="alert" hidden></div>
+
+  <!-- Entrada -->
+  <section class="tela-login" id="tela-login" hidden>
+    <form class="cartao-login" id="form-login" novalidate>
+      <img class="login-logo" src="logo-impettus.png" alt="Grupo Impettus">
+      <h1>Painel de Gestão</h1>
+      <p>Acompanhe as etiquetas vencidas, a vencer e no prazo de cada loja, de onde estiver.</p>
+      <label class="rotulo" for="login-email">E-mail</label>
+      <input class="campo" id="login-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
+      <label class="rotulo" for="login-senha">Senha</label>
+      <input class="campo" id="login-senha" type="password" autocomplete="current-password">
+      <label class="marcar"><input type="checkbox" id="login-manter" checked> Manter conectado neste aparelho</label>
+      <button class="botao-principal" id="btn-entrar" type="submit">Entrar</button>
+      <p class="login-erro" id="login-erro" role="alert" hidden></p>
+      <p class="nota">🔒 O painel só consulta. Baixas por QR ficam na tela Contagem; impressão e cadastros, no app da loja.</p>
+    </form>
+  </section>
+
+  <!-- Primeiro acesso ainda não feito -->
+  <section class="tela-login" id="tela-primeiro" hidden>
+    <div class="cartao-login">
+      <img class="login-logo" src="logo-impettus.png" alt="Grupo Impettus">
+      <h1>Falta o primeiro acesso</h1>
+      <p>Antes de usar o painel, entre uma vez no app <strong>Etiquetas de Validade</strong> no computador para aceitar os termos de uso e criar a sua senha.</p>
+      <button class="botao-principal" id="btn-primeiro-sair" type="button">Voltar</button>
+    </div>
+  </section>
+
+  <!-- Painel -->
+  <main class="painel" id="tela-painel" hidden>
+    <p class="status-linha" id="status-linha"></p>
+
+    <div class="cartoes" id="cartoes">
+      <button type="button" class="cartao critico" data-situacao="vencido"><span class="cartao-num" data-n="vencido">0</span><span class="cartao-nome">Vencidas</span><small>sem baixa</small></button>
+      <button type="button" class="cartao aviso" data-situacao="hoje"><span class="cartao-num" data-n="hoje">0</span><span class="cartao-nome">Vencem hoje</span><small>usar ou descartar</small></button>
+      <button type="button" class="cartao atencao" data-situacao="proximo"><span class="cartao-num" data-n="proximo">0</span><span class="cartao-nome">A vencer</span><small id="cartao-prox-sub">próximos dias</small></button>
+      <button type="button" class="cartao ok" data-situacao="ok"><span class="cartao-num" data-n="ok">0</span><span class="cartao-nome">No prazo</span><small>tudo certo</small></button>
+    </div>
+
+    <section class="bloco">
+      <h2>O que precisa de atenção</h2>
+      <ul class="acoes" id="acoes"></ul>
+    </section>
+
+    <section class="bloco">
+      <div class="bloco-topo">
+        <h2>Lojas</h2>
+        <select class="campo campo-pequeno" id="filtro-marca" aria-label="Marca" hidden></select>
+      </div>
+      <div class="grade-lojas" id="lojas"></div>
+    </section>
+
+    <section class="bloco" id="bloco-etiquetas">
+      <div class="bloco-topo">
+        <h2>Etiquetas ativas</h2>
+        <select class="campo campo-pequeno" id="filtro-loja" aria-label="Loja"></select>
+      </div>
+      <div class="filtros">
+        <div class="chips" id="chips">
+          <button type="button" class="chip" data-situacao="">Todas</button>
+          <button type="button" class="chip" data-situacao="vencido">Vencidas</button>
+          <button type="button" class="chip" data-situacao="hoje">Hoje</button>
+          <button type="button" class="chip" data-situacao="proximo">A vencer</button>
+          <button type="button" class="chip" data-situacao="ok">No prazo</button>
+        </div>
+        <input class="campo campo-busca" id="filtro-busca" type="search" placeholder="Buscar produto, nº, responsável…" aria-label="Buscar">
+      </div>
+      <div class="lista" id="lista"></div>
+      <button type="button" class="botao-secundario" id="btn-mais" hidden>Mostrar mais</button>
+    </section>
+  </main>
+
+  <footer class="rodape" id="rodape">
+    <span>🔒 Painel só de consulta: nada é impresso nem alterado nesta tela. Baixas por QR só na Contagem, com confirmação.</span>
+    <span id="copyright"></span>
+  </footer>
+</body>
+</html>
