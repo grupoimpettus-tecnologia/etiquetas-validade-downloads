@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 351 72" role="img" aria-label="Prazzo">
+  <!-- Prazzo: mesmo desenho do prazzo.svg, com a palavra clara para fundo escuro. -->
+  <defs>
+    <linearGradient id="prazzo-laranja" x1="8" y1="8" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff9640"/>
+      <stop offset="1" stop-color="#ec4f1c"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(-8.4 -8.8) scale(1.4)">
+    <path fill="url(#prazzo-laranja)" fill-rule="evenodd" d="M15 9H39.2a6 6 0 0 1 4.6 2.15L57.6 27.9a6.4 6.4 0 0 1 0 8.2L43.8 52.85A6 6 0 0 1 39.2 55H15a9 9 0 0 1-9-9V18a9 9 0 0 1 9-9ZM48.5 28.6a3.4 3.4 0 1 0 0 6.8a3.4 3.4 0 1 0 0-6.8Z"/>
+    <circle cx="25.5" cy="32" r="13.2" fill="#fff"/>
+    <path d="M25.5 21.4v1.9M36.1 32h-1.9M25.5 42.6v-1.9M14.9 32h1.9" stroke="#f6b48f" stroke-width="2" stroke-linecap="round"/>
+    <path d="M20.6 31.2 25.5 35.6 32.4 26.6" fill="none" stroke="#ec4f1c" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="25.5" cy="35.6" r="1.9" fill="#ec4f1c"/>
+  </g>
+  <g transform="translate(89.6 -12)" fill="#f7f3ef">
+    <g fill="none" stroke="#f7f3ef" stroke-width="13">
+      <path d="M6.5 16V80M6.5 22.5H28a16.5 16.5 0 0 1 0 33H6.5"/>
+      <path d="M63.5 36V80M63.5 60C63.5 47 69 42.5 84 42.5"/>
+      <path d="M125.5 36V80"/>
+      <circle cx="110" cy="58" r="15.5"/>
+      <circle cx="239" cy="58" r="15.5"/>
+    </g>
+    <path d="M138 36H172V49L155.5 67H172V80H138V67L154.5 49H138ZM177 36H211V49L194.5 67H211V80H177V67L193.5 49H177Z"/>
+  </g>
+</svg>

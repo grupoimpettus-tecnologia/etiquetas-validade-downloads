@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://brvqytarftsogyxdbicb.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0e0e10">
+  <meta name="robots" content="noindex, nofollow">
+  <!-- Link do instalador do app (posto pelo gerar-painel.mjs a partir do app). -->
+  <meta name="prazzo-instalador" content="https://app.179-197-234-103.sslip.io/baixar/Prazzo-Setup.exe">
+  <!-- Endereço próprio deste painel (PRAZZO_URL_PROPRIETARIO na publicação; vazio = só endereço local de teste). -->
+  <meta name="prazzo-endereco-proprietario" content="https://prazzo.179-197-234-103.sslip.io/painel/proprietario.html">
+  <link rel="icon" href="icone.png">
+  <!-- Tema claro/escuro antes de pintar (script clássico; guarda só a escolha do tema, nada da sessão). -->
+  <script src="tema.js"></script>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="proprietario.css">
+  <title>Painel do Proprietário · Prazzo</title>
+  <script type="module" src="proprietario.js"></script>
+</head>
+<body class="pagina-proprietario na-entrada">
+  <header class="topo" id="topo" hidden>
+    <img class="topo-logo" src="prazzo-negativo.svg" alt="Prazzo">
+    <div class="topo-textos">
+      <strong>Painel do Proprietário</strong>
+      <small id="topo-sub"></small>
+    </div>
+    <nav class="abas" aria-label="Seções">
+      <button class="aba" id="aba-clientes" type="button">Clientes</button>
+      <button class="aba" id="aba-novo" type="button">Novo cliente</button>
+      <button class="aba" id="aba-email" type="button">E-mail</button>
+    </nav>
+    <button class="botao-icone botao-tema" id="btn-tema" type="button" data-tema-botao title="Tema claro" aria-label="Tema claro"><span class="tema-sol" aria-hidden="true">☀️</span><span class="tema-lua" aria-hidden="true">🌙</span></button>
+    <button class="botao-sair" id="btn-trocar-senha" type="button">Trocar senha</button>
+    <button class="botao-sair" id="btn-sair" type="button">Sair</button>
+  </header>
+  <!-- Sem o topo (entrada), o botão do tema fica no canto. -->
+  <div class="tema-canto">
+    <button class="botao-icone botao-tema" id="btn-tema-entrada" type="button" data-tema-botao title="Tema claro" aria-label="Tema claro"><span class="tema-sol" aria-hidden="true">☀️</span><span class="tema-lua" aria-hidden="true">🌙</span></button>
+  </div>
+
+  <div class="faixa-aviso" id="aviso" role="alert" hidden></div>
+  <p class="faixa-ok" id="mensagem" role="status" hidden></p>
+
+  <!-- Entrada (a sessão fica guardada neste navegador até Sair) -->
+  <section class="tela-login" id="tela-login" hidden>
+    <form class="cartao-login" id="form-login" novalidate>
+      <img class="login-logo" src="prazzo-negativo.svg" alt="Prazzo">
+      <h1>Painel do Proprietário</h1>
+      <p>Clientes, assinaturas e suporte do Prazzo.</p>
+      <label class="rotulo" for="login-email">E-mail</label>
+      <input class="campo" id="login-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
+      <label class="rotulo" for="login-senha">Senha</label>
+      <input class="campo" id="login-senha" type="password" autocomplete="current-password">
+      <button class="botao-principal" id="btn-entrar" type="submit">Entrar</button>
+      <p class="login-erro" id="login-erro" role="alert" hidden></p>
+      <p class="nota">🔒 Depois de entrar, este navegador continua conectado até você clicar em <strong>Sair</strong>. Use só em computador ou celular seu.</p>
+    </form>
+  </section>
+
+  <!-- Quem não é o Proprietário -->
+  <section class="tela-login" id="tela-restrito" hidden>
+    <div class="cartao-login">
+      <img class="login-logo" src="prazzo-negativo.svg" alt="Prazzo">
+      <h1>Acesso restrito</h1>
+      <p>Esta página é só do Proprietário do Prazzo. Para acompanhar as etiquetas das lojas, use o Painel de Gestão.</p>
+      <a class="botao-principal" href="./">Ir para o Painel de Gestão</a>
+      <button class="botao-secundario botao-largo" id="btn-restrito-voltar" type="button">Entrar com outra conta</button>
+    </div>
+  </section>
+
+  <!-- Clientes -->
+  <main class="prop" id="tela-clientes" hidden>
+    <div class="prop-topo">
+      <h1>Clientes</h1>
+      <div class="chips" role="group" aria-label="Filtro dos clientes">
+        <button class="chip ativo" type="button" data-filtro="" aria-pressed="true">Todos</button>
+        <button class="chip" type="button" data-filtro="atencao" aria-pressed="false">Precisa de atenção <span class="chip-conta" id="conta-atencao"></span></button>
+      </div>
+      <button class="botao-secundario" id="btn-atualizar" type="button">Atualizar</button>
+    </div>
+    <p class="status-linha" id="clientes-status" role="status"></p>
+    <div class="tabela-rolagem">
+      <table class="tabela tabela-clientes" id="tabela-clientes">
+        <caption class="so-leitor">Clientes do Prazzo</caption>
+        <thead>
+          <tr>
+            <th scope="col">Cliente</th>
+            <th scope="col">Situação</th>
+            <th scope="col">Pago até</th>
+            <th scope="col">Bloqueia em</th>
+            <th scope="col">Valor mensal</th>
+            <th scope="col"><abbr title="ativas / com etiqueta nos últimos 30 dias / contratadas">Lojas</abbr></th>
+            <th scope="col">Usuários</th>
+            <th scope="col">Última etiqueta</th>
+            <th scope="col">Números em aberto</th>
+          </tr>
+        </thead>
+        <tbody id="clientes-corpo"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Um cliente: ações e histórico -->
+  <main class="prop" id="tela-cliente" hidden>
+    <button class="link-texto voltar" id="btn-voltar-clientes" type="button">← Clientes</button>
+    <div class="cliente-cabeca">
+      <h1 id="cliente-nome"></h1>
+      <span class="chip-situacao" id="cliente-chip"></span>
+    </div>
+    <p class="alerta-lojas" id="cliente-alerta" role="note" hidden></p>
+    <dl class="ficha-cliente" id="cliente-ficha"></dl>
+    <div class="acoes-cliente" id="cliente-acoes" role="group" aria-label="Ações do cliente"></div>
+    <section class="bloco">
+      <h2>Histórico</h2>
+      <div class="tabela-rolagem">
+        <table class="tabela tabela-historico" id="tabela-historico">
+          <caption class="so-leitor">Histórico da assinatura do cliente</caption>
+          <thead>
+            <tr>
+              <th scope="col">Quando</th>
+              <th scope="col">Quem</th>
+              <th scope="col">O quê</th>
+              <th scope="col">Antes → depois</th>
+              <th scope="col">Dias</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Forma</th>
+              <th scope="col">Referência</th>
+              <th scope="col">Observação</th>
+            </tr>
+          </thead>
+          <tbody id="historico-corpo"></tbody>
+        </table>
+      </div>
+      <p class="status-linha" id="historico-status" role="status"></p>
+    </section>
+  </main>
+
+  <!-- Novo cliente -->
+  <main class="prop" id="tela-novo" hidden>
+    <h1>Novo cliente</h1>
+    <p class="cont-ajuda">Cria de uma vez o cliente, a assinatura, a 1ª marca (com os setores Cozinha, Bar e Estoque Seco) e o 1º master, que troca a senha e aceita os termos no 1º acesso. Com o envio de e-mails ligado (aba E-mail), os dados de acesso vão por e-mail ao 1º master; no fim aparece também o texto pronto para você mandar.</p>
+    <form class="form-prop" id="form-novo">
+      <fieldset>
+        <legend>Cliente</legend>
+        <label class="rotulo" for="novo-nome">Nome do cliente *</label>
+        <input class="campo" id="novo-nome" name="nome" type="text" required maxlength="80" autocomplete="off">
+        <label class="rotulo" for="novo-documento">CNPJ</label>
+        <input class="campo" id="novo-documento" name="documento" type="text" maxlength="18" inputmode="numeric" autocomplete="off">
+        <div class="linha-campos">
+          <div><label class="rotulo" for="novo-contato-nome">Contato</label><input class="campo" id="novo-contato-nome" name="contatoNome" type="text" maxlength="80" autocomplete="off"></div>
+          <div><label class="rotulo" for="novo-contato-email">E-mail do contato</label><input class="campo" id="novo-contato-email" name="contatoEmail" type="email" maxlength="120" autocomplete="off"></div>
+          <div><label class="rotulo" for="novo-contato-telefone">Telefone</label><input class="campo" id="novo-contato-telefone" name="contatoTelefone" type="tel" maxlength="30" autocomplete="off"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>1ª marca</legend>
+        <div class="linha-campos">
+          <div><label class="rotulo" for="novo-marca">Nome da marca *</label><input class="campo" id="novo-marca" name="marcaNome" type="text" required maxlength="60" autocomplete="off"></div>
+          <div class="campo-cor"><label class="rotulo" for="novo-cor">Cor</label><input class="campo" id="novo-cor" name="marcaCor" type="color" value="#ff6b2c"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>1º master</legend>
+        <div class="linha-campos">
+          <div><label class="rotulo" for="novo-master-nome">Nome *</label><input class="campo" id="novo-master-nome" name="masterNome" type="text" required maxlength="60" autocomplete="off"></div>
+          <div><label class="rotulo" for="novo-master-email">E-mail *</label><input class="campo" id="novo-master-email" name="masterEmail" type="email" required maxlength="120" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+        </div>
+        <label class="rotulo" for="novo-senha">Senha provisória *</label>
+        <div class="campo-com-botao">
+          <input class="campo campo-senha" id="novo-senha" name="masterSenha" type="text" required minlength="8" autocomplete="off" spellcheck="false">
+          <button class="botao-secundario" id="btn-gerar-senha" type="button">Gerar</button>
+        </div>
+        <!-- Sem "name": fica fora do conteúdo do formulário (marcar ou desmarcar não vira outra operação na nuvem). -->
+        <label class="marcar-campo" for="novo-enviar-email">
+          <input type="checkbox" id="novo-enviar-email" disabled>
+          <span>Mandar os dados de acesso por e-mail ao 1º master</span>
+        </label>
+        <p class="ajuda-campo" id="novo-email-ajuda">Conferindo o envio de e-mails…</p>
+      </fieldset>
+      <fieldset>
+        <legend>Assinatura</legend>
+        <div class="linha-campos">
+          <div><label class="rotulo" for="novo-pago-ate">Pago até / fim do teste *</label><input class="campo" id="novo-pago-ate" name="pagoAte" type="date" required></div>
+          <div><label class="rotulo" for="novo-valor">Valor mensal (R$)</label><input class="campo" id="novo-valor" name="valorMensal" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></div>
+          <div><label class="rotulo" for="novo-lojas">Lojas contratadas *</label><input class="campo" id="novo-lojas" name="lojasContratadas" type="number" required min="1" max="1000" step="1" value="1"></div>
+        </div>
+        <div class="linha-campos">
+          <div><label class="rotulo" for="novo-aviso">Aviso (dias antes) *</label><input class="campo" id="novo-aviso" name="diasAviso" type="number" required min="0" max="60" step="1" value="7"></div>
+          <div><label class="rotulo" for="novo-tolerancia">Tolerância (dias depois) *</label><input class="campo" id="novo-tolerancia" name="diasTolerancia" type="number" required min="0" max="60" step="1" value="5"></div>
+        </div>
+        <label class="rotulo" for="novo-observacao">Observação</label>
+        <textarea class="campo" id="novo-observacao" name="observacao" maxlength="500" rows="2"></textarea>
+      </fieldset>
+      <p class="login-erro" id="novo-erro" role="alert" hidden></p>
+      <div class="barra-botoes">
+        <button class="botao-principal" id="btn-criar" type="submit">Criar cliente</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Cliente criado: o texto pronto (a senha provisória aparece só aqui) -->
+  <main class="prop" id="tela-criado" hidden>
+    <h1>Cliente criado</h1>
+    <p class="cont-ajuda" id="criado-resumo"></p>
+    <p class="resultado-email" id="criado-email" role="status" hidden></p>
+    <label class="rotulo" for="criado-texto">Texto para mandar ao cliente</label>
+    <textarea class="campo texto-pronto" id="criado-texto" readonly rows="11"></textarea>
+    <p class="nota-forte">A senha provisória aparece só agora: copie o texto antes de sair desta tela.</p>
+    <p class="status-linha" id="criado-copia" role="status"></p>
+    <div class="barra-botoes">
+      <button class="botao-principal" id="btn-copiar-criado" type="button">Copiar texto</button>
+      <button class="botao-secundario" id="btn-abrir-criado" type="button">Abrir o cliente</button>
+    </div>
+  </main>
+
+  <!-- E-mail: o envio dos dados de acesso (serviço do Prazzo neste endereço, /api/email; a senha fica cifrada lá) -->
+  <main class="prop" id="tela-email" hidden>
+    <div class="prop-topo">
+      <h1>E-mail</h1>
+      <span class="chip-situacao cinza" id="email-chip">Não configurado</span>
+      <button class="botao-secundario" id="btn-atualizar-email" type="button">Atualizar</button>
+    </div>
+    <p class="cont-ajuda">O Prazzo manda os dados de acesso (com a senha provisória) na hora em que um master cria um usuário ou redefine uma senha, e quando você cria um cliente ou redefine o acesso de um master por aqui. O envio é pela sua conta de e-mail (SMTP), configurada abaixo. Do envio fica guardado só para quem, quando e se deu certo; o conteúdo, nunca.</p>
+    <p class="status-linha" id="email-status" role="status"></p>
+    <p class="alerta-lojas" id="email-parado" role="note" hidden></p>
+    <form class="form-prop" id="form-email" novalidate>
+      <fieldset>
+        <legend>Servidor de e-mail</legend>
+        <p class="ajuda-campo">Dicas prontas (preenchem o servidor, a porta e a segurança):</p>
+        <div class="chips" role="group" aria-label="Dicas prontas de provedor">
+          <button class="chip" type="button" data-provedor="outlook">Hotmail / Outlook</button>
+          <button class="chip" type="button" data-provedor="brevo">Brevo</button>
+        </div>
+        <p class="previa" id="email-dica-provedor" role="note" hidden></p>
+        <label class="rotulo" for="email-servidor">Servidor (SMTP) *</label>
+        <input class="campo" id="email-servidor" type="text" required maxlength="253" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="smtp-mail.outlook.com">
+        <div class="linha-campos">
+          <div>
+            <label class="rotulo" for="email-porta">Porta *</label>
+            <select class="campo" id="email-porta">
+              <option value="587">587</option>
+              <option value="465">465</option>
+              <option value="25">25</option>
+              <option value="2525">2525</option>
+            </select>
+          </div>
+          <div>
+            <label class="rotulo" for="email-seguranca">Segurança *</label>
+            <select class="campo" id="email-seguranca">
+              <option value="starttls">STARTTLS</option>
+              <option value="ssl">SSL/TLS</option>
+            </select>
+          </div>
+        </div>
+        <p class="ajuda-campo">A porta 465 usa SSL/TLS; as portas 587, 25 e 2525 usam STARTTLS.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Conta de e-mail</legend>
+        <label class="rotulo" for="email-usuario">Usuário *</label>
+        <input class="campo" id="email-usuario" type="text" required maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <label class="rotulo" for="email-senha">Senha (ou chave SMTP)</label>
+        <input class="campo" id="email-senha" type="password" maxlength="512" autocomplete="new-password" spellcheck="false" aria-describedby="email-senha-ajuda">
+        <p class="ajuda-campo" id="email-senha-ajuda">Só de escrita: a senha vai cifrada para o servidor do Prazzo e nunca volta para a tela.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Remetente</legend>
+        <div class="linha-campos">
+          <div><label class="rotulo" for="email-remetente-nome">Nome</label><input class="campo" id="email-remetente-nome" type="text" maxlength="80" autocomplete="off" placeholder="Prazzo"></div>
+          <div><label class="rotulo" for="email-remetente-email">E-mail *</label><input class="campo" id="email-remetente-email" type="email" required maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+        </div>
+        <label class="rotulo" for="email-responder-para">Responder para</label>
+        <input class="campo" id="email-responder-para" type="email" maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <p class="ajuda-campo">Opcional: para onde vão as respostas (por exemplo, o e-mail do suporte).</p>
+      </fieldset>
+      <label class="marcar-campo" for="email-ligado">
+        <input type="checkbox" id="email-ligado" disabled aria-describedby="email-ligado-ajuda">
+        <span>Envio ligado</span>
+      </label>
+      <p class="ajuda-campo" id="email-ligado-ajuda"></p>
+      <p class="login-erro" id="email-erro" role="alert" hidden></p>
+      <div class="barra-botoes">
+        <button class="botao-principal" id="btn-salvar-email" type="submit">Salvar</button>
+      </div>
+      <p class="resultado-email" id="email-salvo" role="status" hidden></p>
+    </form>
+    <section class="bloco">
+      <h2>E-mail de teste</h2>
+      <form class="form-prop" id="form-teste-email" novalidate>
+        <div>
+          <label class="rotulo" for="email-teste-para">Mandar o e-mail de teste para</label>
+          <div class="campo-com-botao">
+            <input class="campo" id="email-teste-para" type="email" required maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false">
+            <button class="botao-secundario" id="btn-teste-email" type="submit">Enviar e-mail de teste</button>
+          </div>
+          <p class="ajuda-campo">O teste usa a configuração salva e sai na hora. Só depois de um teste que passou dá para ligar o envio.</p>
+        </div>
+        <p class="status-linha" id="email-ultimo-teste"></p>
+        <p class="resultado-email" id="email-teste-resultado" role="status" hidden></p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Formulários das ações (pagamento, dias extras, suspender, configurar, suporte) -->
+  <dialog class="dialogo" id="dialogo" aria-labelledby="dialogo-titulo">
+    <form class="dialogo-form" id="dialogo-form">
+      <h2 id="dialogo-titulo"></h2>
+      <div class="dialogo-corpo" id="dialogo-corpo"></div>
+      <p class="login-erro" id="dialogo-erro" role="alert" hidden></p>
+      <div class="dialogo-botoes">
+        <button class="botao-secundario" id="dialogo-fechar" type="button">Fechar</button>
+        <button class="botao-principal" id="dialogo-enviar" type="submit"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="rodape">
+    <span>🔒 Tudo o que é feito aqui fica no histórico do cliente.</span>
+    <span id="copyright"></span>
+  </footer>
+</body>
+</html>

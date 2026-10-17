@@ -1,0 +1,21 @@
+/* Termos de uso pelo site (usa as cores e a base de app.css). */
+
+.cartao-termos { width: min(680px, 100%); }
+.termos-quem {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px;
+  margin: 14px 0 0; padding: 10px 12px; border-radius: 12px;
+  background: var(--superficie-2); border: 1px solid var(--borda); color: var(--texto-2); font-size: 14px;
+}
+.termos-quem strong { color: var(--texto); word-break: break-all; }
+.termos-texto {
+  max-height: 50vh; overflow-y: auto; margin-top: 12px; padding: 4px 16px 14px;
+  background: var(--superficie-2); border: 1px solid var(--borda-forte); border-radius: 12px;
+  color: var(--texto-2); font-size: 14.5px; line-height: 1.55;
+}
+.termos-texto:focus { outline: 1px solid var(--acento); }
+.termos-texto h3 { color: var(--texto); font-size: 15px; margin: 14px 0 4px; }
+.cartao-login .termos-texto p { text-align: left; margin: 0; }
+.cartao-login .termos-texto .termos-fim { text-align: center; color: var(--texto-3); margin-top: 16px; font-size: 12px; }
+.cartao-login .termos-rolagem { font-size: 13px; color: var(--texto-3); margin: 8px 0 0; text-align: left; }
+.termos-aceite { align-items: flex-start; line-height: 1.45; color: var(--texto); }
+.termos-aceite input { margin-top: 2px; flex: none; }

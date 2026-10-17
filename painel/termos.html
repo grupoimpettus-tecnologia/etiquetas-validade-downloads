@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://brvqytarftsogyxdbicb.supabase.co; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0e0e10">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="icone.png">
+  <link rel="apple-touch-icon" href="icone.png">
+  <!-- Tema claro/escuro antes de pintar (script clássico, sem esperar o resto da página). -->
+  <script src="tema.js"></script>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="termos.css">
+  <title>Termos de uso · Prazzo</title>
+  <script type="module" src="termos.js"></script>
+</head>
+<body class="na-entrada">
+  <!-- Esta página não tem topo: o botão do tema fica no canto. -->
+  <div class="tema-canto">
+    <button class="botao-icone botao-tema" id="btn-tema-entrada" type="button" data-tema-botao title="Tema claro" aria-label="Tema claro"><span class="tema-sol" aria-hidden="true">☀️</span><span class="tema-lua" aria-hidden="true">🌙</span></button>
+  </div>
+  <div class="faixa-aviso" id="aviso" role="alert" hidden></div>
+
+  <!-- Entrada (mesma sessão do Painel de Gestão e da Contagem) -->
+  <section class="tela-login" id="tela-login" hidden>
+    <form class="cartao-login" id="form-login" novalidate>
+      <img class="login-logo" src="prazzo-negativo.svg" alt="Prazzo">
+      <h1>Termos de uso</h1>
+      <p>Entre com o seu acesso para ler e aceitar os termos de uso e a política de privacidade.</p>
+      <label class="rotulo" for="login-email">E-mail</label>
+      <input class="campo" id="login-email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
+      <label class="rotulo" for="login-senha">Senha</label>
+      <input class="campo" id="login-senha" type="password" autocomplete="current-password">
+      <label class="marcar"><input type="checkbox" id="login-manter" checked> Manter conectado neste aparelho</label>
+      <button class="botao-principal" id="btn-entrar" type="submit">Entrar</button>
+      <p class="login-erro" id="login-erro" role="alert" hidden></p>
+      <p class="nota">🔒 Use o mesmo acesso do app. A senha provisória (do primeiro acesso) é trocada no app do computador.</p>
+    </form>
+  </section>
+
+  <!-- Leitura e aceite -->
+  <main class="tela-login" id="tela-termos" hidden>
+    <div class="cartao-login cartao-termos">
+      <img class="login-logo" src="prazzo-negativo.svg" alt="Prazzo">
+      <h1>Termos de uso e política de privacidade</h1>
+      <p id="termos-chamada">Leia e aceite os termos abaixo para continuar. Versão <span id="termos-versao"></span>.</p>
+      <div class="termos-quem">
+        <span>Aceite em nome de <strong id="termos-email"></strong></span>
+        <button type="button" class="link-texto" id="btn-trocar">Não é você? Trocar usuário</button>
+      </div>
+      <div class="termos-texto" id="termos-texto" tabindex="0"></div>
+      <p class="termos-rolagem" id="termos-rolagem">⬇️ Role até o fim para liberar o aceite.</p>
+      <label class="marcar termos-aceite"><input type="checkbox" id="termos-check" disabled> <span>Li e aceito os termos de uso e a política de privacidade. Estou ciente de que meu aceite fica registrado com data, hora e a indicação de que foi feito pelo site.</span></label>
+      <p class="login-erro" id="termos-erro" role="alert" hidden></p>
+      <button class="botao-principal" id="btn-aceitar" type="button" disabled>Aceitar e continuar</button>
+      <a class="botao-secundario botao-largo" id="link-agora-nao" href="./">Voltar sem aceitar</a>
+    </div>
+  </main>
+
+  <!-- Aceite registrado, mas a senha ainda é a provisória -->
+  <section class="tela-login" id="tela-senha" hidden>
+    <div class="cartao-login">
+      <img class="login-logo" src="prazzo-negativo.svg" alt="Prazzo">
+      <h1>Aceite registrado</h1>
+      <p>Falta criar a sua senha pessoal. A senha provisória (criada pelo administrador) é trocada no app <strong>Prazzo</strong> do computador: entre uma vez nele com ela e crie a sua. Depois, volte aqui.</p>
+      <a class="botao-principal" id="link-voltar" href="./">Voltar</a>
+    </div>
+  </section>
+
+  <footer class="rodape">
+    <span>🔒 O aceite fica registrado na nuvem com data e hora do servidor.</span>
+    <span id="copyright"></span>
+  </footer>
+</body>
+</html>
